@@ -1,0 +1,14 @@
+# zizmor configuration — see https://docs.zizmor.sh/configuration/
+#
+# Default `unpinned-uses` audit requires SHA pinning for every `uses:`. That is
+# overkill for this project: the only third-party publishers we use are GitHub
+# itself (`actions/*`) and the linter we are configuring (`oxsecurity/*`).
+# Loosen to `ref-pin` (tag pinning) for those, keep `hash-pin` (SHA) as the
+# default for any other publisher we might add later.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        oxsecurity/*: ref-pin
+        "*": hash-pin
