@@ -13,7 +13,7 @@
     "sync": "node tools/sync.mjs",
     "compose": "node tools/compose.mjs",
     "mcp": "node tools/mcp-server.mjs",
-    "gen-hooks": "node tools/gen-hooks.mjs",
+    "gen-hooks": "node tools/gen-hooks.mjs && biome format --write .claude-plugin/plugin.json",
     "validate": "node tools/skill-validate.mjs",
     "lint": "biome check",
     "lint:fix": "biome check --write",

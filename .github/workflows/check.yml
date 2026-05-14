@@ -29,5 +29,5 @@ jobs:
         run: npm test
       - name: Verify gen-hooks output is committed
         run: |
-          node tools/gen-hooks.mjs
+          npm run gen-hooks
           git diff --exit-code -- .claude-plugin/plugin.json agents/openai.yaml .github/workflows/skill-x-drift.yml
