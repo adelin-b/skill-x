@@ -9,10 +9,11 @@ Two gaps in agent skills today:
 1. **Drift** — a skill written against `zod@3` rots when `zod@4` ships.
 2. **Cross-cutting rules** — "use Zod for every Convex schema" is a *combination* of two skills, not a third hand-written skill that diverges from its parents.
 
-This repo ships two meta-skills:
+This repo ships three meta-skills:
 
 - `skill-sync` — detects upstream drift (npm version, changelog hash, docs hash, GitHub release hash), regenerates the affected SKILL.md, bumps `last_synced`/`upstream_hash`.
-- `skill-compose` — merges N source skills into a derived skill under a composition rule. Records `composed_from` lineage so the derived skill re-composes whenever a parent is re-synced.
+- `skill-compose` — merges N source skills into a derived skill under a composition rule. Applies a structured reasoning recipe (frame → axes → ≥3 variants → weakest links → Pareto → pick + justify) and persists `compose_variants[]` + `selected` + `selection_rationale` in the derived skill's frontmatter so future readers see what was rejected and why.
+- `skill-audit` — scans every SKILL.md plus the project's `package.json`. Surfaces integration opportunities, trigger contradictions, weak composes (under-explored variant set), stale primaries, and expired validity. Recommends the highest-leverage next move.
 
 A worked end-to-end example (`zod-base` + `convex-base` → `convex-with-zod`) lives under [`examples/`](./examples/README.md). It is not shipped to marketplaces — it is purely a test fixture and reference implementation of the frontmatter contract.
 
@@ -69,7 +70,8 @@ skill-x/
 │   └── skill-x-drift.yml              # universal CI fallback (generated)
 ├── skills/                            # production skills (shipped to marketplaces)
 │   ├── skill-sync/SKILL.md            # detect upstream drift
-│   └── skill-compose/SKILL.md         # compose derived skills
+│   ├── skill-compose/SKILL.md         # compose derived skills with embedded reasoning
+│   └── skill-audit/SKILL.md           # cross-skill audit + recommendations
 ├── examples/                          # worked example — test fixture only
 │   ├── README.md
 │   ├── skills/
@@ -126,6 +128,9 @@ npm run sync          # detect drift across all primary skills
 npm run compose       # detect staleness across all derived skills
 npm run mcp           # start MCP server (stdio)
 npm run gen-hooks     # regenerate per-tool hook configs
+npm run audit         # cross-skill audit (human report)
+npm run audit:write   # write .skill-x/audit.{json,md}
+npm run audit:check   # CI gate: exit 1 on contradictions or weak composes
 
 # Worked example end-to-end (does not touch production skills/)
 npm run example:check     # validate + compose against examples/

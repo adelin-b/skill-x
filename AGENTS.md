@@ -9,12 +9,13 @@ Universal guide for AI coding agents (Claude Code, Codex CLI, Cursor, Gemini CLI
 | Skill | Location | Purpose |
 |-------|----------|---------|
 | `skill-sync` | `skills/` | Detect and repair drift between a skill and its upstream sources (npm packages, docs pages, changelogs, GitHub releases). |
-| `skill-compose` | `skills/` | Combine two or more primary skills into a new derived skill governed by a composition rule. Re-compose cascades when a parent re-syncs. |
+| `skill-compose` | `skills/` | Combine two or more primary skills into a new derived skill under a composition rule. Walks the LLM through frame → axes → ≥3 variants → weakest links → Pareto → pick + justify, and persists the alternatives in the derived skill's frontmatter. |
+| `skill-audit` | `skills/` | Scan all SKILL.md + the project's `package.json`. Flags integration opportunities, trigger contradictions, weak composes, stale primaries, expired validity. Recommends the highest-leverage next move. |
 | `zod-base` | `examples/skills/` | Demo primary skill — runtime schemas with Zod. Not shipped to marketplaces; lives here as a worked example. |
 | `convex-base` | `examples/skills/` | Demo primary skill — Convex backend functions. Not shipped; example only. |
 | `convex-with-zod` | `examples/skills/` | Demo derived skill — `zod-base` + `convex-base` under a compose rule. Not shipped; example only. |
 
-Production marketplaces only see `skills/skill-sync` and `skills/skill-compose`. The `examples/` tree exists for end-to-end testing of the contract.
+Production marketplaces only see `skills/skill-sync`, `skills/skill-compose`, and `skills/skill-audit`. The `examples/` tree exists for end-to-end testing of the contract.
 
 ## Frontmatter contract
 

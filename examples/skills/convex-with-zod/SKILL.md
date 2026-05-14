@@ -15,6 +15,25 @@ compose_rule: |
   Convex validator with `zodToConvex` for `defineTable`.
   Errors raised by Zod parsing inside a query/mutation should be wrapped
   in `ConvexError` with a typed `{ code, issues }` payload.
+compose_variants:
+  - id: zod-as-truth
+    summary: "Zod schemas authored first; zodToConvex converts to Convex v.* at module init"
+    weakest_link: "depends on convex-helpers; recursive types limited to Zod's z.lazy() depth"
+  - id: convex-as-truth
+    summary: "Convex v.* validators authored first; convex-zod infers Zod for ingress parsing"
+    weakest_link: "loses Zod refinement chain; .transform / .superRefine not expressible"
+  - id: dual-source
+    summary: "Both validators authored independently; codegen step keeps them in sync"
+    weakest_link: "build step every change; two truths drift if codegen skipped"
+selected: zod-as-truth
+selection_rationale: |
+  zod-as-truth dominates on the rule's stated intent (Zod is the single
+  source of truth for ingress parsing). convex-as-truth drops Zod's
+  refinement chain — direct violation of the rule's spirit. dual-source
+  is dominated on simplicity and reversibility (build step infects every
+  workflow). zod-as-truth's weakest link (convex-helpers dep) is paid once
+  and accepted.
+weakest_link: "convex-helpers ships breaking changes between minors — re-evaluate at v3"
 last_synced: 1970-01-01T00:00:00Z
 upstream_hash: ~
 ---

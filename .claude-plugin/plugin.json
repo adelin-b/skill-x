@@ -2,7 +2,7 @@
   "name": "skill-x",
   "description": "Skills that stay current with upstreams and compose with each other.",
   "version": "0.1.0",
-  "skills": ["skills/skill-sync", "skills/skill-compose"],
+  "skills": ["skills/skill-sync", "skills/skill-compose", "skills/skill-audit"],
   "hooks": {
     "PostToolUse": [
       {

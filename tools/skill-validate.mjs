@@ -91,6 +91,58 @@ export async function validate(name, knownSkills = null) {
         });
       }
     }
+
+    // Reasoning contract: a derived skill is a decision; the alternatives
+    // it considered must be persisted so a future reader can see what was
+    // rejected and why.
+    const variants = fm.compose_variants || [];
+    if (variants.length < 2) {
+      issues.push({
+        severity: "error",
+        message: `derived skill must have ≥2 compose_variants (found ${variants.length}); ≥3 recommended`,
+      });
+    } else if (variants.length < 3) {
+      issues.push({
+        severity: "warn",
+        message: `derived skill has ${variants.length} compose_variants; ≥3 recommended for a meaningful Pareto front`,
+      });
+    }
+    const ids = new Set();
+    for (const v of variants) {
+      if (!v.id || !NAME_RE.test(v.id)) {
+        issues.push({
+          severity: "error",
+          message: `compose_variants[].id "${v.id}" must be kebab-case`,
+        });
+      } else if (ids.has(v.id)) {
+        issues.push({ severity: "error", message: `compose_variants[].id "${v.id}" duplicated` });
+      } else {
+        ids.add(v.id);
+      }
+      if (!v.summary)
+        issues.push({ severity: "error", message: `variant "${v.id}" missing summary` });
+      if (!v.weakest_link)
+        issues.push({ severity: "warn", message: `variant "${v.id}" missing weakest_link` });
+    }
+    if (variants.length >= 2) {
+      if (!fm.selected) {
+        issues.push({
+          severity: "error",
+          message: "derived skill must declare selected variant id",
+        });
+      } else if (!ids.has(fm.selected)) {
+        issues.push({
+          severity: "error",
+          message: `selected "${fm.selected}" does not match any compose_variants[].id`,
+        });
+      }
+      if (!fm.selection_rationale || fm.selection_rationale.trim().length === 0) {
+        issues.push({
+          severity: "error",
+          message: "selection_rationale required when ≥2 variants exist",
+        });
+      }
+    }
   }
   if (isPrimary) {
     for (const src of sources) {
@@ -114,6 +166,13 @@ export async function validate(name, knownSkills = null) {
     issues.push({
       severity: "error",
       message: `last_synced "${fm.last_synced}" is not a parseable ISO timestamp`,
+    });
+  }
+
+  if (fm.valid_until && !Number.isFinite(Date.parse(fm.valid_until))) {
+    issues.push({
+      severity: "error",
+      message: `valid_until "${fm.valid_until}" is not a parseable ISO timestamp`,
     });
   }
 

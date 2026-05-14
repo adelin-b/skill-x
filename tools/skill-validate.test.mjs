@@ -45,11 +45,88 @@ test("validate: clean derived skill passes", async (t) => {
     sources: [],
     composed_from: ["a-parent", "b-parent"],
     compose_rule: "use Zod for every Convex validator",
+    compose_variants: [
+      { id: "variant-a", summary: "first approach", weakest_link: "extra dep" },
+      { id: "variant-b", summary: "second approach", weakest_link: "loses refinement" },
+      { id: "variant-c", summary: "third approach", weakest_link: "build step required" },
+    ],
+    selected: "variant-a",
+    selection_rationale:
+      "variant-a dominates on the stated intent; variant-b drops refinement; variant-c needs codegen",
     last_synced: "2026-05-06T00:00:00Z",
     upstream_hash: null,
   });
   const issues = await validate(name);
   assert.deepEqual(issues, []);
+});
+
+test("validate: derived skill with too few variants errors", async (t) => {
+  const name = "test-val-thin";
+  await withFixture(t, name, {
+    name,
+    description: "Thin-variants derived skill fixture; should fail validate.",
+    sources: [],
+    composed_from: ["a-parent"],
+    compose_rule: "rule",
+    compose_variants: [{ id: "only", summary: "only one", weakest_link: "n/a" }],
+    selected: "only",
+    selection_rationale: "no alternatives explored",
+    last_synced: "2026-05-06T00:00:00Z",
+    upstream_hash: null,
+  });
+  const issues = await validate(name);
+  assert.equal(
+    issues.some((i) => i.severity === "error" && /≥2 compose_variants/.test(i.message)),
+    true,
+  );
+});
+
+test("validate: selected must match a variant id", async (t) => {
+  const name = "test-val-mismatch";
+  await withFixture(t, name, {
+    name,
+    description: "Selected-variant-mismatch derived skill fixture; should fail.",
+    sources: [],
+    composed_from: ["a-parent"],
+    compose_rule: "rule",
+    compose_variants: [
+      { id: "a", summary: "a", weakest_link: "n/a" },
+      { id: "b", summary: "b", weakest_link: "n/a" },
+    ],
+    selected: "ghost",
+    selection_rationale: "picked ghost which does not exist",
+    last_synced: "2026-05-06T00:00:00Z",
+    upstream_hash: null,
+  });
+  const issues = await validate(name);
+  assert.equal(
+    issues.some((i) => i.severity === "error" && /selected "ghost"/.test(i.message)),
+    true,
+  );
+});
+
+test("validate: missing selection_rationale errors when ≥2 variants", async (t) => {
+  const name = "test-val-norationale";
+  await withFixture(t, name, {
+    name,
+    description: "No-rationale derived skill fixture; should fail validate.",
+    sources: [],
+    composed_from: ["a-parent"],
+    compose_rule: "rule",
+    compose_variants: [
+      { id: "a", summary: "a", weakest_link: "n/a" },
+      { id: "b", summary: "b", weakest_link: "n/a" },
+    ],
+    selected: "a",
+    selection_rationale: "",
+    last_synced: "2026-05-06T00:00:00Z",
+    upstream_hash: null,
+  });
+  const issues = await validate(name);
+  assert.equal(
+    issues.some((i) => i.severity === "error" && /selection_rationale required/.test(i.message)),
+    true,
+  );
 });
 
 test("validate: rejects bad name and short description", async (t) => {
