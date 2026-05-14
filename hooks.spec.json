@@ -1,0 +1,25 @@
+{
+  "$schema": "./hooks.spec.schema.json",
+  "name": "skill-x",
+  "description": "Single source of truth for skill-x lifecycle hooks. Generated outputs per agent live under .claude-plugin/, agents/, and .github/workflows/. Regenerate with `npm run gen-hooks`.",
+  "hooks": [
+    {
+      "id": "drift-on-package-edit",
+      "description": "When the user edits package.json, check whether any tracked skill's npm-sourced dependency drifted.",
+      "events": ["postToolUse"],
+      "match": {
+        "tool": "Edit|Write|MultiEdit",
+        "filePattern": "**/package.json"
+      },
+      "run": "node tools/hook-sync-on-pkg.mjs",
+      "blocking": false
+    },
+    {
+      "id": "stale-warn-session-start",
+      "description": "On session start, surface any derived skill whose parent has been re-synced more recently.",
+      "events": ["sessionStart"],
+      "run": "node tools/compose.mjs",
+      "blocking": false
+    }
+  ]
+}

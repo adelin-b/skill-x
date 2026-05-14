@@ -1,0 +1,8 @@
+.osgrep
+.DS_Store
+node_modules/
+.omc/
+megalinter-reports/
+mega-linter.log
+manifest/*.json
+!manifest/.gitkeep

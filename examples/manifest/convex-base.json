@@ -1,0 +1,25 @@
+{
+  "skill": "convex-base",
+  "checked_at": "2026-05-14T21:50:39.645Z",
+  "signals": [
+    {
+      "kind": "npm",
+      "id": "convex",
+      "version": "1.38.0",
+      "hash": "sha256:9f9011da0839568e0b29097183ebc90c20eda0af17f0b28a11e20ba1dcba01ce"
+    },
+    {
+      "kind": "url",
+      "id": "https://docs.convex.dev",
+      "hash": "sha256:7e6c69de76a93409372a14316a82465621d65d5edd4628b8bbc879d6b450766b"
+    },
+    {
+      "kind": "url",
+      "id": "https://github.com/get-convex/convex-js/releases.atom",
+      "hash": "sha256:4e0e1cca2a9439df00833c7be9bd4565bb10e7adb072c1516b22842749e6eee2"
+    }
+  ],
+  "live_hash": "sha256:f99572a9ce54ccaad0fa4deeb4f1df172121e1d13281681e1c31bfeb25bb3353",
+  "recorded_hash": null,
+  "drifted": true
+}

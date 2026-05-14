@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "adelin-b",
+  "version": "0.1.0",
+  "description": "Skills that stay current with their upstream sources and compose with each other under cross-cutting rules.",
+  "owner": {
+    "name": "adelin-b",
+    "email": "adelinb.pro@gmail.com",
+    "url": "https://github.com/adelin-b"
+  },
+  "metadata": {
+    "pluginRoot": "."
+  },
+  "plugins": [
+    {
+      "name": "skill-x",
+      "source": "github:adelin-b/skill-x",
+      "description": "skills.sh-compatible meta-skills: skill-sync (detect upstream drift in any agent skill) and skill-compose (combine N source skills into a derived skill under a rule). Worked examples shipped separately under examples/.",
+      "version": "0.1.0",
+      "category": "skill-management",
+      "tags": ["skills", "drift-detection", "composition", "zod", "convex", "agent-skills"],
+      "author": "adelin-b",
+      "license": "MIT"
+    }
+  ]
+}

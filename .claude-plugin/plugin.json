@@ -1,0 +1,30 @@
+{
+  "name": "skill-x",
+  "description": "Skills that stay current with upstreams and compose with each other.",
+  "version": "0.1.0",
+  "skills": ["skills/skill-sync", "skills/skill-compose"],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/hook-sync-on-pkg.mjs"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/compose.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

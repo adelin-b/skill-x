@@ -1,0 +1,38 @@
+name: mega-linter
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mega-linter-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mega-linter:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: MegaLinter
+        uses: oxsecurity/megalinter/flavors/javascript@v8
+        env:
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Archive reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MegaLinter-reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+          if-no-files-found: ignore

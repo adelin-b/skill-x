@@ -1,0 +1,25 @@
+{
+  "skill": "zod-base",
+  "checked_at": "2026-05-14T21:50:41.023Z",
+  "signals": [
+    {
+      "kind": "npm",
+      "id": "zod",
+      "version": "4.4.3",
+      "hash": "sha256:f97dfe534fe558a626d7b2635db175dca19504662e67e6ab1941a68ca9e65910"
+    },
+    {
+      "kind": "url",
+      "id": "https://zod.dev",
+      "hash": "sha256:aa8683598942f93ffd16b234f8642fc9249bf22cf39e88847382416200b18651"
+    },
+    {
+      "kind": "url",
+      "id": "https://github.com/colinhacks/zod/releases.atom",
+      "hash": "sha256:a0e72ffa9182f790948f3eea04f4abbc4bdb5ab415aa473ca35dd42335d16277"
+    }
+  ],
+  "live_hash": "sha256:d09ce3c24a3323aeabf90a7cbfb8fbcbc366c32cf7848b4b235d161ccd2cdb07",
+  "recorded_hash": "sha256:d09ce3c24a3323aeabf90a7cbfb8fbcbc366c32cf7848b4b235d161ccd2cdb07",
+  "drifted": false
+}

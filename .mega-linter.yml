@@ -1,0 +1,40 @@
+# MegaLinter config — see https://megalinter.io/latest/configuration/
+#
+# Strategy: only lint formats Biome does not cover. Biome handles JS + JSON;
+# MegaLinter handles YAML, Markdown, GitHub Actions workflows, and scans for
+# secrets. Keeps CI fast and avoids double-linting conflicts.
+
+APPLY_FIXES: none
+VALIDATE_ALL_CODEBASE: true
+SHOW_ELAPSED_TIME: true
+FILEIO_REPORTER: false
+
+# Auto-detect everything except the descriptors Biome already covers.
+DISABLE:
+  - JAVASCRIPT
+  - TYPESCRIPT
+  - JSON
+  - COPYPASTE
+  - SPELL
+
+# Pinned per-linter behavior.
+ENABLE_LINTERS:
+  - YAML_YAMLLINT
+  - YAML_PRETTIER
+  - MARKDOWN_MARKDOWNLINT
+  - ACTION_ACTIONLINT
+  - REPOSITORY_GITLEAKS
+  - REPOSITORY_TRIVY
+
+# Ignore paths that have generated or cached content.
+FILTER_REGEX_EXCLUDE: "(node_modules/|manifest/|\\.omc/|\\.osgrep/|package-lock\\.json)"
+
+# Looser markdown — long lines, optional HTML, no H1 requirement, no table-style nits, list spacing.
+MARKDOWN_MARKDOWNLINT_ARGUMENTS: "--disable MD013 MD033 MD041 MD060 MD032 --"
+
+# Trivy: only fail on HIGH/CRITICAL, ignore unfixed CVEs.
+REPOSITORY_TRIVY_ARGUMENTS: "--severity HIGH,CRITICAL --ignore-unfixed"
+
+# yamllint reads .yamllint.yml at the repo root — see that file for rule overrides.
+# (We do NOT pass YAML_YAMLLINT_ARGUMENTS because MegaLinter already passes -c,
+#  and yamllint refuses both -c and -d.)

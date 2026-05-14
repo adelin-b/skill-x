@@ -1,0 +1,28 @@
+name: check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Lint (Biome)
+        run: npm run lint
+      - name: Validate SKILL.md frontmatter
+        run: npm run validate -- --strict
+      - name: Unit tests
+        run: npm test
+      - name: Verify gen-hooks output is committed
+        run: |
+          node tools/gen-hooks.mjs
+          git diff --exit-code -- .claude-plugin/plugin.json agents/openai.yaml .github/workflows/skill-x-drift.yml
