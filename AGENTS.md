@@ -4,18 +4,20 @@ Universal guide for AI coding agents (Claude Code, Codex CLI, Cursor, Gemini CLI
 
 ## What this repo provides
 
-`skill-x` is a monorepo of [Agent Skills](https://agentskills.io) that **stay current with their upstream sources** and **compose with each other**.
+`skill-x` is a monorepo of [Agent Skills](https://agentskills.io) that **stay current with their upstream sources**, **compose with each other**, and **detect drift across schemas and code**.
 
-| Skill | Location | Purpose |
-|-------|----------|---------|
-| `skill-sync` | `skills/` | Detect and repair drift between a skill and its upstream sources (npm packages, docs pages, changelogs, GitHub releases). |
-| `skill-compose` | `skills/` | Combine two or more primary skills into a new derived skill under a composition rule. Walks the LLM through frame → axes → ≥3 variants → weakest links → Pareto → pick + justify, and persists the alternatives in the derived skill's frontmatter. |
-| `skill-audit` | `skills/` | Scan all SKILL.md + the project's `package.json`. Flags integration opportunities, trigger contradictions, weak composes, stale primaries, expired validity. Recommends the highest-leverage next move. |
-| `zod-base` | `examples/skills/` | Demo primary skill — runtime schemas with Zod. Not shipped to marketplaces; lives here as a worked example. |
-| `convex-base` | `examples/skills/` | Demo primary skill — Convex backend functions. Not shipped; example only. |
-| `convex-with-zod` | `examples/skills/` | Demo derived skill — `zod-base` + `convex-base` under a compose rule. Not shipped; example only. |
+| Skill | Category | Location | Purpose |
+|-------|----------|----------|---------|
+| `skill-sync` | `skill-meta` | `skills/` | Detect and repair drift between a skill and its upstream sources (npm packages, docs pages, changelogs, GitHub releases). |
+| `skill-audit` | `skill-meta` | `skills/` | Scan all SKILL.md + the project's `package.json`. Flags integration opportunities, trigger contradictions, weak composes, stale primaries, expired validity. Recommends the highest-leverage next move. |
+| `skill-compose` | `composition` | `skills/` | Combine two or more primary skills into a new derived skill under a composition rule. Walks the LLM through frame → axes → ≥3 variants → weakest links → Pareto → pick + justify, and persists the alternatives in the derived skill's frontmatter. |
+| `schema-drift` | `drift-detection` | `skills/` | Detect schemas drifted across layers — forms, API contracts, DB models, GraphQL/tRPC/Convex routers. Inventory the stack, recommend a single source-of-truth pattern, propose one concrete refactor. |
+| `code-drift` | `drift-detection` | `skills/` | Detect code drifted from upstream truth — shims for closed issues, deprecated APIs, broken doc/path references, version-stale workarounds, intra-repo pattern divergence. Two-phase detection (zero-LLM) / fix (focused LLM brief). Inspired by `mex-agent`. |
+| `zod-base` | — | `examples/skills/` | Demo primary skill — runtime schemas with Zod. Not shipped to marketplaces; lives here as a worked example. |
+| `convex-base` | — | `examples/skills/` | Demo primary skill — Convex backend functions. Not shipped; example only. |
+| `convex-with-zod` | — | `examples/skills/` | Demo derived skill — `zod-base` + `convex-base` under a compose rule. Not shipped; example only. |
 
-Production marketplaces only see `skills/skill-sync`, `skills/skill-compose`, and `skills/skill-audit`. The `examples/` tree exists for end-to-end testing of the contract.
+Production marketplaces see five plugin entries — one per skill in `skills/` — each carrying `category`, `tags`, `keywords` for filtering in `/plugin` listings. The `examples/` tree exists only for end-to-end testing of the contract.
 
 ## Frontmatter contract
 
@@ -68,6 +70,17 @@ Custom fields beyond `name`/`description` are preserved when generators redistri
 `skill-compose` activates when:
 - User asks to combine two skills or describes a cross-cutting rule
 - `tools/compose.mjs` reports a derived skill as `STALE` (parent re-synced)
+
+`schema-drift` activates when:
+- User says "schema drift", "schemas don't match", "form rejects valid data", "drizzle drift", "openapi out of sync"
+- A schema-bearing file changes (`**/schema.{ts,prisma,sql,graphql,json,yaml}`, `*Schema.ts`, `*Validator.ts`)
+- `drizzle-kit check` reports changes, `prisma migrate diff --exit-code` returns 2, `openapi-diff` flags breaking changes, or tRPC contracts fail to compile
+
+`code-drift` activates when:
+- User says "code drift", "can we remove the workaround", "upstream fixed yet", "any TODOs expired", "pattern check"
+- `package.json` or `package-lock.json` changes (new versions may close shims)
+- Cron tick (daily) — most signals are remote (gh issues, npm registry, doc URLs)
+- Before a major-version dependency bump or a release
 
 ## Constraints
 

@@ -1,7 +1,7 @@
 {
   "name": "skill-x",
-  "version": "0.1.0",
-  "description": "skills.sh-compatible skills that stay current with upstreams and compose with each other.",
+  "version": "0.2.0",
+  "description": "skills.sh-compatible skills that stay current with upstreams, compose with each other, and detect drift across schemas and code.",
   "type": "module",
   "private": true,
   "bin": {

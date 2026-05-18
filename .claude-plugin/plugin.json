@@ -1,8 +1,14 @@
 {
   "name": "skill-x",
-  "description": "Skills that stay current with upstreams and compose with each other.",
-  "version": "0.1.0",
-  "skills": ["skills/skill-sync", "skills/skill-compose", "skills/skill-audit"],
+  "description": "Skills that stay current with upstreams, compose with each other, and detect drift across schemas and code.",
+  "version": "0.2.0",
+  "skills": [
+    "skills/skill-sync",
+    "skills/skill-compose",
+    "skills/skill-audit",
+    "skills/schema-drift",
+    "skills/code-drift"
+  ],
   "hooks": {
     "PostToolUse": [
       {

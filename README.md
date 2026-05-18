@@ -1,34 +1,58 @@
 # skill-x
 
-skills.sh-compatible monorepo of [Agent Skills](https://agentskills.io) that **stay current** with their upstreams and **compose** with each other.
+skills.sh-compatible monorepo of [Agent Skills](https://agentskills.io) that **stay current** with their upstreams, **compose** with each other, and detect **drift** across schemas and code.
 
 ## Why
 
-Two gaps in agent skills today:
+Three gaps in agent skills today:
 
-1. **Drift** — a skill written against `zod@3` rots when `zod@4` ships.
+1. **Skill drift** — a skill written against `zod@3` rots when `zod@4` ships.
 2. **Cross-cutting rules** — "use Zod for every Convex schema" is a *combination* of two skills, not a third hand-written skill that diverges from its parents.
+3. **Code drift** — schemas drift across forms/API/DB; workarounds outlive the upstream bugs they shim; idioms multiply silently inside a single repo.
 
-This repo ships three meta-skills:
+This repo ships five skills across three categories:
+
+### `skill-meta` — operate on skills themselves
 
 - `skill-sync` — detects upstream drift (npm version, changelog hash, docs hash, GitHub release hash), regenerates the affected SKILL.md, bumps `last_synced`/`upstream_hash`.
+- `skill-audit` — scans every SKILL.md plus the project's `package.json`. Surfaces integration opportunities, trigger contradictions, weak composes, stale primaries, expired validity. Recommends the highest-leverage next move.
+
+### `composition` — derive new skills from existing ones
+
 - `skill-compose` — merges N source skills into a derived skill under a composition rule. Applies a structured reasoning recipe (frame → axes → ≥3 variants → weakest links → Pareto → pick + justify) and persists `compose_variants[]` + `selected` + `selection_rationale` in the derived skill's frontmatter so future readers see what was rejected and why.
-- `skill-audit` — scans every SKILL.md plus the project's `package.json`. Surfaces integration opportunities, trigger contradictions, weak composes (under-explored variant set), stale primaries, and expired validity. Recommends the highest-leverage next move.
+
+### `drift-detection` — keep code aligned with its declared truth
+
+- `schema-drift` — detect schemas drifted across forms/API contracts/DB models/GraphQL/tRPC/Convex. Inventory the stack, recommend the single source-of-truth pattern, propose one concrete refactor with the right tool to enforce it.
+- `code-drift` — detect code drifted from upstream truth: shims for closed issues, deprecated APIs, broken doc/path references, version-stale workarounds, intra-repo pattern divergence. Two-phase — zero-LLM detection via `knip` / `lychee` / `ncu` / `gh` CLI, AI invoked only for focused fixes. Inspired by [`mex-agent`](https://github.com/theDakshJaitly/mex).
 
 A worked end-to-end example (`zod-base` + `convex-base` → `convex-with-zod`) lives under [`examples/`](./examples/README.md). It is not shipped to marketplaces — it is purely a test fixture and reference implementation of the frontmatter contract.
 
 ## Install matrix
 
-`skill-x` follows the open [Agent Skills standard](https://agentskills.io) (SKILL.md frontmatter + body), so the same skill files work across every major AI coding tool. Pick whichever install path fits your tool:
+`skill-x` follows the open [Agent Skills standard](https://agentskills.io) (SKILL.md frontmatter + body), so the same skill files work across every major AI coding tool. The Claude marketplace ships **each skill as its own plugin entry** with `category` + `tags` + `keywords` for filtering — pick the bundle you want or install them à la carte. Pick whichever install path fits your tool:
 
 | Target | Install command |
 |--------|-----------------|
-| **Claude Code** (plugin marketplace) | `/plugin marketplace add adelin-b/skill-x` then `/plugin install skill-x@adelin-b` |
+| **Claude Code** (plugin marketplace, all) | `/plugin marketplace add adelin-b/skill-x` then `/plugin install <skill-name>@adelin-b` per skill |
+| **Claude Code** (à la carte examples) | `/plugin install skill-sync@adelin-b`, `/plugin install schema-drift@adelin-b`, `/plugin install code-drift@adelin-b` |
 | **Codex CLI** | `skill-installer adelin-b/skill-x` *or* copy `skills/` to `~/.agents/skills/` |
 | **Universal** (Cursor, Windsurf, Aider, Gemini CLI, OpenCode, Antigravity, +others) | `npx openskills install adelin-b/skill-x --universal` |
 | **skills.sh directory** | `npx skills add adelin-b/skill-x --all` |
 | **Multi-tool authoring** (rulesync) | `npx rulesync import --targets skill-x` then `npx rulesync generate` |
 | **MCP-capable agent** (any) | Add to MCP config: `{ "command": "node", "args": ["tools/mcp-server.mjs"] }` |
+
+### Categorization
+
+The marketplace exposes three categories. Use them to filter `/plugin` listings.
+
+| Category | Plugins |
+|----------|---------|
+| `skill-meta` | `skill-sync`, `skill-audit` |
+| `composition` | `skill-compose` |
+| `drift-detection` | `schema-drift`, `code-drift` |
+
+Categorization lives in [`.claude-plugin/marketplace.json`](./.claude-plugin/marketplace.json). The SKILL.md frontmatter keeps an optional `category:` field for cross-tool consumers that don't read marketplace metadata (skill-audit uses it for grouping).
 
 The MCP server exposes `list_skills`, `check_drift`, `check_compose`, and `stamp_skill` as universal verbs callable from any MCP-aware client.
 
@@ -69,9 +93,11 @@ skill-x/
 ├── .github/workflows/
 │   └── skill-x-drift.yml              # universal CI fallback (generated)
 ├── skills/                            # production skills (shipped to marketplaces)
-│   ├── skill-sync/SKILL.md            # detect upstream drift
-│   ├── skill-compose/SKILL.md         # compose derived skills with embedded reasoning
-│   └── skill-audit/SKILL.md           # cross-skill audit + recommendations
+│   ├── skill-sync/SKILL.md            # [skill-meta]       detect upstream drift
+│   ├── skill-audit/SKILL.md           # [skill-meta]       cross-skill audit + recommendations
+│   ├── skill-compose/SKILL.md         # [composition]      compose derived skills with embedded reasoning
+│   ├── schema-drift/SKILL.md          # [drift-detection]  cross-layer schema drift
+│   └── code-drift/SKILL.md            # [drift-detection]  workarounds, deprecations, broken refs
 ├── examples/                          # worked example — test fixture only
 │   ├── README.md
 │   ├── skills/

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "adelin-b",
-  "version": "0.1.0",
-  "description": "Skills that stay current with their upstream sources and compose with each other under cross-cutting rules.",
+  "version": "0.2.0",
+  "description": "Skills that stay current with their upstream sources, compose with each other under cross-cutting rules, and detect drift across schemas and code.",
   "owner": {
     "name": "adelin-b",
     "email": "adelinb.pro@gmail.com",
@@ -13,12 +13,68 @@
   },
   "plugins": [
     {
-      "name": "skill-x",
-      "source": "github:adelin-b/skill-x",
-      "description": "skills.sh-compatible meta-skills: skill-sync (detect upstream drift in any agent skill) and skill-compose (combine N source skills into a derived skill under a rule). Worked examples shipped separately under examples/.",
+      "name": "skill-sync",
+      "source": "./skills/skill-sync",
+      "description": "Detect drift between a skill and its upstream sources (npm version, changelog hash, docs hash, GitHub release hash). Regenerate body, stamp upstream_hash + last_synced.",
+      "version": "0.2.0",
+      "category": "skill-meta",
+      "tags": ["drift", "upstream", "sync", "npm"],
+      "keywords": ["agent-skills", "changelog", "github-release", "stamp"],
+      "author": "adelin-b",
+      "license": "MIT"
+    },
+    {
+      "name": "skill-compose",
+      "source": "./skills/skill-compose",
+      "description": "Combine N source skills into a derived skill under a compose rule. Walks frame → axes → ≥3 variants → weakest links → Pareto → pick + justify; persists alternatives in frontmatter.",
+      "version": "0.2.0",
+      "category": "composition",
+      "tags": ["compose", "derived", "cross-cutting", "reasoning"],
+      "keywords": ["agent-skills", "structured-reasoning", "pareto"],
+      "author": "adelin-b",
+      "license": "MIT"
+    },
+    {
+      "name": "skill-audit",
+      "source": "./skills/skill-audit",
+      "description": "Scan every SKILL.md plus project's package.json. Surface integration opportunities, trigger contradictions, weak composes, stale primaries, expired validity. Propose the highest-leverage next move.",
+      "version": "0.2.0",
+      "category": "skill-meta",
+      "tags": ["audit", "stale", "contradiction"],
+      "keywords": ["agent-skills", "package-json", "integration"],
+      "author": "adelin-b",
+      "license": "MIT"
+    },
+    {
+      "name": "schema-drift",
+      "source": "./skills/schema-drift",
+      "description": "Detect schemas drifted across layers (forms, API contracts, DB models, GraphQL/tRPC/Convex). Inventory the stack, recommend the single source-of-truth pattern, propose one concrete refactor with the right tool to enforce it.",
       "version": "0.1.0",
-      "category": "skill-management",
-      "tags": ["skills", "drift-detection", "composition", "zod", "convex", "agent-skills"],
+      "category": "drift-detection",
+      "tags": [
+        "schema",
+        "drift",
+        "zod",
+        "valibot",
+        "drizzle",
+        "prisma",
+        "openapi",
+        "graphql",
+        "trpc",
+        "convex"
+      ],
+      "keywords": ["typescript", "validation", "single-source-of-truth", "codegen"],
+      "author": "adelin-b",
+      "license": "MIT"
+    },
+    {
+      "name": "code-drift",
+      "source": "./skills/code-drift",
+      "description": "Detect code drifted from upstream truth — shims for closed issues, deprecated APIs, broken doc links, version-stale workarounds, intra-repo pattern divergence. Zero-LLM detection via off-the-shelf tools, AI invoked only for focused fixes. Inspired by mex-agent.",
+      "version": "0.1.0",
+      "category": "drift-detection",
+      "tags": ["code-drift", "workaround", "shim", "deprecation", "knip", "lychee", "ncu"],
+      "keywords": ["dependency-cruiser", "dependency-management", "static-analysis", "mex"],
       "author": "adelin-b",
       "license": "MIT"
     }
